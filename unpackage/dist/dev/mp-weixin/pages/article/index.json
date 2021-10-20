@@ -1,0 +1,8 @@
+{
+  "navigationBarTitleText": "寄语墙",
+  "enablePullDownRefresh": true,
+  "usingComponents": {
+    "x-card": "/components/xCard",
+    "x-empty": "/components/xEmpty"
+  }
+}

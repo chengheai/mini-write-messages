@@ -1,0 +1,11 @@
+{
+  "navigationBarTitleText": "寄语语录",
+  "enablePullDownRefresh": true,
+  "usingComponents": {
+    "uni-load-more": "/uni_modules/uni-load-more/components/uni-load-more/uni-load-more",
+    "i-user": "/pages/user/index",
+    "i-write": "/pages/custom/index",
+    "i-article": "/pages/article/index",
+    "i-default": "/pages/default/index"
+  }
+}

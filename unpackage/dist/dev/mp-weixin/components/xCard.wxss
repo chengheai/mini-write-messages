@@ -1,0 +1,131 @@
+@charset "UTF-8";
+/**
+ * 这里是uni-app内置的常用样式变量
+ *
+ * uni-app 官方扩展插件及插件市场（https://ext.dcloud.net.cn）上很多三方插件均使用了这些样式变量
+ * 如果你是插件开发者，建议你使用scss预处理，并在插件代码中直接使用这些变量（无需 import 这个文件），方便用户通过搭积木的方式开发整体风格一致的App
+ *
+ */
+/**
+ * 如果你是App开发者（插件使用者），你可以通过修改这些变量来定制自己的插件主题，实现自定义主题功能
+ *
+ * 如果你的项目同样使用了scss预处理，你也可以直接在你的 scss 代码中使用如下变量，同时无需 import 这个文件
+ */
+/* 颜色变量 */
+/* 行为相关颜色 */
+/* 文字基本颜色 */
+/* 背景颜色 */
+/* 边框颜色 */
+/* 尺寸变量 */
+/* 文字尺寸 */
+/* 图片尺寸 */
+/* Border Radius */
+/* 水平间距 */
+/* 垂直间距 */
+/* 透明度 */
+/* 文章场景相关 */
+.flex.data-v-113e6b7d, .card-item.data-v-113e6b7d, .card-item-right.data-v-113e6b7d, .card-item-right-imgs.data-v-113e6b7d, .card-item-right-bom.data-v-113e6b7d, .card-item-right-bom-heart.data-v-113e6b7d {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.is-public.data-v-113e6b7d {
+  background-color: #0090be !important;
+}
+.card-item.data-v-113e6b7d {
+  justify-content: flex-start;
+  align-items: flex-start;
+  width: 720rpx;
+  padding: 30rpx;
+  box-sizing: border-box;
+  background-color: #fff;
+  border-radius: 20rpx;
+  margin-bottom: 20rpx;
+}
+.card-item-avatar.data-v-113e6b7d {
+  width: 120rpx;
+  height: 120rpx;
+  margin-right: 20rpx;
+}
+.card-item-avatar image.data-v-113e6b7d {
+  width: 100%;
+  height: 100%;
+}
+.card-item-avatar-text.data-v-113e6b7d {
+  width: 100%;
+  font-size: 30rpx;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #fff;
+  background: #f0ad4e;
+  border: 10rpx solid #f5f5f5;
+  border-radius: 20rpx;
+  box-sizing: border-box;
+}
+.card-item-right.data-v-113e6b7d {
+  flex-direction: column;
+  align-items: flex-start;
+  position: relative;
+}
+.card-item-right .report.data-v-113e6b7d {
+  position: absolute;
+  z-index: 9;
+  right: 0;
+  top: 0;
+  color: #c8c7cc;
+  font-size: 24rpx;
+}
+.card-item-right .action-wrap.data-v-113e6b7d {
+  position: absolute;
+  z-index: 9;
+  right: 0;
+  top: 0;
+}
+.card-item-right .action-wrap image.data-v-113e6b7d {
+  width: 30rpx;
+  height: 30rpx;
+  margin-left: 30rpx;
+}
+.card-item-right-name.data-v-113e6b7d {
+  font-weight: 600;
+  font-size: 38rpx;
+  color: #0090be;
+}
+.card-item-right-content.data-v-113e6b7d {
+  margin-bottom: 25rpx;
+  width: 500rpx;
+}
+.card-item-right-imgs.data-v-113e6b7d {
+  width: 200rpx;
+  height: 200rpx;
+  justify-content: flex-start;
+  align-items: flex-start;
+}
+.card-item-right-imgs image.data-v-113e6b7d {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  float: left;
+}
+.card-item-right-address.data-v-113e6b7d {
+  color: #0090be;
+  font-size: 24rpx;
+  font-weight: 400;
+  margin: 15rpx 0;
+}
+.card-item-right-bom.data-v-113e6b7d {
+  width: 100%;
+  padding: 0 5rpx;
+  box-sizing: border-box;
+  justify-content: space-between;
+}
+.card-item-right-bom-date.data-v-113e6b7d {
+  font-weight: 300;
+  color: #c8c7cc;
+}
+.card-item-right-bom-heart text.data-v-113e6b7d {
+  margin-left: 5rpx;
+}
+

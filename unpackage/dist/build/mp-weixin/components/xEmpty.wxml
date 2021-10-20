@@ -1,0 +1,1 @@
+<view class="empty data-v-c7fcbeae"><image src="../static/empty.png" mode="aspectFit" class="data-v-c7fcbeae"></image><text class="data-v-c7fcbeae">{{desc}}</text></view>

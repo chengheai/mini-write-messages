@@ -1,0 +1,1 @@
+<view class="f-s-c date data-v-60e75431"><text class="data-v-60e75431">{{dateObj.cYear+"年"+dateObj.cMonth+"月"+dateObj.cDay+"日"}}</text><text class="data-v-60e75431">{{dateObj.ncWeek}}</text><text class="data-v-60e75431">{{dateObj.IMonthCn+dateObj.IDayCn}}</text></view>

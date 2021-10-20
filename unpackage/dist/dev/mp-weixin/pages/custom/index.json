@@ -1,0 +1,11 @@
+{
+  "component": true,
+  "usingComponents": {
+    "uni-icons": "/uni_modules/uni-icons/components/uni-icons/uni-icons",
+    "uni-data-checkbox": "/uni_modules/uni-data-checkbox/components/uni-data-checkbox/uni-data-checkbox",
+    "uni-popup": "/uni_modules/uni-popup/components/uni-popup/uni-popup",
+    "uni-popup-message": "/uni_modules/uni-popup/components/uni-popup-message/uni-popup-message",
+    "lunar-date": "/components/lunarDate",
+    "x-login": "/components/xLogin"
+  }
+}

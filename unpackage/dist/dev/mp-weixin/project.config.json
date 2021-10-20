@@ -1,0 +1,40 @@
+{
+  "description": "项目配置文件。",
+  "packOptions": {
+    "ignore": []
+  },
+  "setting": {
+    "urlCheck": false,
+    "minified": true,
+    "postcss": true
+  },
+  "compileType": "miniprogram",
+  "libVersion": "",
+  "appid": "wxe7517d835b4a9b9f",
+  "projectname": "写寄语",
+  "condition": {
+    "search": {
+      "current": -1,
+      "list": []
+    },
+    "conversation": {
+      "current": -1,
+      "list": []
+    },
+    "game": {
+      "current": -1,
+      "list": []
+    },
+    "miniprogram": {
+      "current": 1,
+      "list": [
+        {
+          "name": "",
+          "path": "",
+          "query": "",
+          "id": 0
+        }
+      ]
+    }
+  }
+}

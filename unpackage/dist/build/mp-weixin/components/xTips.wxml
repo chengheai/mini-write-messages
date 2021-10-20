@@ -1,0 +1,1 @@
+<view hidden="{{!(tipVisible)}}" class="data-v-4a7f86b4"><view class="tips data-v-4a7f86b4"><text class="data-v-4a7f86b4">{{title}}</text><uni-icons class="icon data-v-4a7f86b4" vue-id="441ef3fe-1" color="#fff" size="20" type="close" data-event-opts="{{[['^click',[['handleClose']]]]}}" bind:click="__e" bind:__l="__l"></uni-icons></view></view>

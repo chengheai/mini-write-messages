@@ -1,1 +1,2 @@
-# mini-write-messages
+# write-messages
+for miniprogram
