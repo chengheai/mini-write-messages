@@ -4,7 +4,7 @@ import api from '@/api'
 import dayjs from 'dayjs'
 import 'dayjs/locale/zh-cn'
 import relativeTime from 'dayjs/plugin/relativeTime'
-import '@/common/index.scss'
+import '@/common/index.css'
 dayjs.locale('zh-cn')
 dayjs.extend(relativeTime)
 

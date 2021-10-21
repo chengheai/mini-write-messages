@@ -32,7 +32,7 @@
 .mine-wrapper.data-v-137d5072 {
   position: relative;
   background-color: #f5f5f5;
-  height: auto;
+  height: 100vh;
 }
 .mine-wrapper .bg.data-v-137d5072 {
   position: fixed;
@@ -45,8 +45,8 @@
 }
 .mine-wrapper .center.data-v-137d5072 {
   position: absolute;
-  min-height: calc(100vh - 100rpx);
-  padding: 50rpx 15rpx 15rpx;
+  min-height: calc(100vh - 160rpx);
+  padding: 120rpx 15rpx 80rpx;
   width: 100%;
   box-sizing: border-box;
   z-index: 3;
@@ -105,7 +105,7 @@
 }
 .mine-wrapper .mine.data-v-137d5072 {
   width: 100%;
-  height: calc(100vh - 100rpx);
+  height: 100vh;
   position: absolute;
   z-index: 3;
   flex-direction: column;

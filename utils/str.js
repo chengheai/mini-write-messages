@@ -112,12 +112,6 @@ export function timestampFormat(timestamp) {
 		}
 	}
 }
-export function clearStorage(){
-	uni.removeStorageSync('userId');
-	uni.removeStorageSync('userInfo');
-	uni.removeStorageSync('token');
-	uni.setStorageSync('hasLogin', -1)
-}
 export function requestLogin() {
 	return new Promise((resolve, reject) => {
 		uni.login({

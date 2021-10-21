@@ -14,7 +14,7 @@ export function fetchList(data) {
 export function fetchDel(data) {
 	return request({
 		method: 'DELETE',
-		url: `/api/article/delete/${data._id}`,
+		url: `/api/article/delete/${data.id}`,
 		data
 	})
 }
@@ -23,7 +23,7 @@ export function fetchDel(data) {
 export function fetchArticle(data) {
 	return request({
 		method: 'GET',
-		url: `/api/article/detail/${data._id}`,
+		url: `/api/article/detail/${data.id}`,
 		data
 	})
 }
@@ -31,7 +31,7 @@ export function fetchArticle(data) {
 export function editArticle(data) {
 	return request({
 		method: 'PUT',
-		url: `/api/article/update/${data._id}`,
+		url: `/api/article/detail/${data.id}`,
 		data
 	})
 }

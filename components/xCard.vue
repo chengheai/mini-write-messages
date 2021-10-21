@@ -8,11 +8,6 @@
 		<!-- 右边 -->
 		<view class="card-item-right">
 			<text v-show="showReport" class="report" @click="actionSheetTap(dataSource)">举报</text>
-			<view class="action-wrap" v-show="showAction">
-				<image @tap.stop="handleLock(dataSource)" class="scale-task i-lock" v-if="dataSource.public === '0'" src="../static/lock.png" mode="aspectFit"></image>
-				<image @tap.stop="handleLock(dataSource)" class="scale-task i-unlock" v-if="dataSource.public === '1'" src="../static/unlock.png" mode="aspectFit"></image>
-				<image @tap.stop="handleDel(dataSource)" class="scale-task i-trash" src="../static/trash.png" mode="aspectFit"></image>
-			</view>
 			<!-- 昵称 -->
 			<view class="card-item-right-name">{{ dataSource.nickName }}</view>
 			<!-- 内容 -->
@@ -48,11 +43,11 @@ export default {
 			type: Object,
 			default() {
 				return {};
-			}
+			},
 		},
-		subIndex: {
-			type: [String, Number],
-			default: 0
+		subIndex:{
+			type:[String,Number],
+			default:0
 		},
 		// 头像模型，square-带圆角方形，circle-圆形
 		mode: {
@@ -66,11 +61,6 @@ export default {
 		showAvatar: {
 			type: Boolean,
 			default: true
-		},
-		// 个人操作
-		showAction: {
-			type: Boolean,
-			default: false
 		}
 	},
 	data() {
@@ -88,43 +78,6 @@ export default {
 	},
 	methods: {
 		timestampFormat,
-		async handleLock(row) {
-			let that = this;
-			let obj = {
-				...row,
-				public: row.public === '1' ? '0' : '1'
-			};
-			const { code, result } = await that.$api.article.editArticle({ ...obj });
-			if (code === 200) {
-				uni.showToast({
-					icon: 'none',
-					title: '更新成功'
-				});
-				that.$emit('reload', { page: Math.floor(parseInt(that.subIndex) / 10) + 1 });
-			}
-		},
-		handleDel(row) {
-			let that = this;
-			uni.showModal({
-				title: '提示',
-				content: `确定删除该条寄语吗?`,
-				success: async function(res) {
-					if (res.confirm) {
-						const { code, result } = await that.$api.article.fetchDel({ ...row });
-						if (code === 200) {
-							uni.showToast({
-								icon: 'none',
-								title: '删除成功'
-							});
-							that.$emit('reload', { page: Math.floor(parseInt(that.subIndex) / 10) + 1, _id: row._id });
-						}
-						console.log('用户点击确定');
-					} else if (res.cancel) {
-						console.log('用户点击取消');
-					}
-				}
-			});
-		},
 		actionSheetTap(query) {
 			const that = this;
 			let userId = uni.getStorageSync('userId');
@@ -138,14 +91,14 @@ export default {
 				// },
 				success: async e => {
 					console.log(e.tapIndex);
-					if (query.reports && query.reports.split(',').includes(userId)) {
+					if(query.reports && query.reports.split(',').includes(userId)){
 						uni.showModal({
-							title: '提示',
-							content: '您已经举报过了，无需重复提交 ！',
-							showCancel: false,
-							confirmText: '知道了'
-						});
-						return;
+							title:'提示',
+							content:'您已经举报过了，无需重复提交 ！',
+							showCancel:false,
+							confirmText:'知道了'
+						})
+						return
 					}
 					let type = e.tapIndex + 1;
 					const { code, result } = await that.$api.like.fetchReport({
@@ -157,7 +110,7 @@ export default {
 							title: '提交成功',
 							icon: 'success'
 						});
-						that.$emit('reload', { page: Math.floor(parseInt(that.subIndex) / 10) + 1 });
+						this.$emit('reload');
 					}
 				}
 			});
@@ -183,9 +136,9 @@ export default {
 			if (code === 200) {
 				console.log('ok');
 				// 发送操作的内容所处的页数
-				console.log(this.subIndex);
-				console.log(Math.floor(parseInt(this.subIndex) / 10) + 1);
-				this.$emit('reload', Math.floor(parseInt(this.subIndex) / 10) + 1);
+				console.log(this.subIndex)
+				console.log(Math.floor(parseInt(this.subIndex)/10)+1)
+				this.$emit('reload',Math.floor(parseInt(this.subIndex)/10)+1);
 			}
 		},
 		handleOpenMap(data) {
@@ -200,7 +153,7 @@ export default {
 				current: 0,
 				urls: imgsArray
 			});
-			uni.stopPullDownRefresh();
+			uni.stopPullDownRefresh()
 		}
 	}
 };
@@ -255,22 +208,11 @@ export default {
 		position: relative;
 		.report {
 			position: absolute;
-			z-index: 9;
+			z-index: 999;
 			right: 0;
 			top: 0;
 			color: #c8c7cc;
 			font-size: 24rpx;
-		}
-		.action-wrap {
-			position: absolute;
-			z-index: 9;
-			right: 0;
-			top: 0;
-			image {
-				width: 30rpx;
-				height: 30rpx;
-				margin-left: 30rpx;
-			}
 		}
 		&-name {
 			font-weight: 600;

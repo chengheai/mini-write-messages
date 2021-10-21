@@ -71,22 +71,11 @@
 }
 .card-item-right .report.data-v-113e6b7d {
   position: absolute;
-  z-index: 9;
+  z-index: 999;
   right: 0;
   top: 0;
   color: #c8c7cc;
   font-size: 24rpx;
-}
-.card-item-right .action-wrap.data-v-113e6b7d {
-  position: absolute;
-  z-index: 9;
-  right: 0;
-  top: 0;
-}
-.card-item-right .action-wrap image.data-v-113e6b7d {
-  width: 30rpx;
-  height: 30rpx;
-  margin-left: 30rpx;
 }
 .card-item-right-name.data-v-113e6b7d {
   font-weight: 600;

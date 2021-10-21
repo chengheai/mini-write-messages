@@ -26,15 +26,8 @@
       "list": []
     },
     "miniprogram": {
-      "current": 1,
-      "list": [
-        {
-          "name": "",
-          "path": "",
-          "query": "",
-          "id": 0
-        }
-      ]
+      "current": -1,
+      "list": []
     }
   }
 }

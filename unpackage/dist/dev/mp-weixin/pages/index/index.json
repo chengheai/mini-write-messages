@@ -1,11 +1,11 @@
 {
-  "navigationBarTitleText": "寄语语录",
-  "enablePullDownRefresh": true,
+  "navigationBarTitleText": "写寄语",
   "usingComponents": {
-    "uni-load-more": "/uni_modules/uni-load-more/components/uni-load-more/uni-load-more",
-    "i-user": "/pages/user/index",
-    "i-write": "/pages/custom/index",
-    "i-article": "/pages/article/index",
-    "i-default": "/pages/default/index"
+    "uni-icons": "/uni_modules/uni-icons/components/uni-icons/uni-icons",
+    "uni-data-checkbox": "/uni_modules/uni-data-checkbox/components/uni-data-checkbox/uni-data-checkbox",
+    "uni-popup": "/uni_modules/uni-popup/components/uni-popup/uni-popup",
+    "uni-popup-message": "/uni_modules/uni-popup/components/uni-popup-message/uni-popup-message",
+    "lunar-date": "/components/lunarDate",
+    "x-login": "/components/xLogin"
   }
 }

@@ -1,211 +1,113 @@
 <template>
-	<view style="background-color: f5f5f5;" :style="[wrapStyle]">
-		<view v-if="theme == 'default'"><i-default :payload="dList" @d-reload="handleReload" /></view>
-
-		<view v-if="theme == 'custom'">
-			<i-user v-if="active == 2" :payload="uList" :userInfo="userInfo" :total="total" @u-reload="handleReload" />
-			<i-write v-if="active == 1" />
-			<i-article v-if="active == 0" :payload="aList" @a-reload="handleReload" />
-			<view class="b-tab f-sa-c" :style="{ 'padding-bottom': isIphoneX ? '64rpx' : '0' }">
-				<view class="t-item f-c-c-c" :class="{ active: active == index }" v-for="(it, index) in tabs" :key="index" @click="handleClick(index, it)">
-					<image :src="active == index ? it.asrc : it.src" mode="aspectFill"></image>
-					<text>{{ it.name }}</text>
+	<view class="content">
+		<lunar-date style="width: 100%;" />
+		<view class="form-wrapper">
+			<!-- 内容 -->
+			<view class="uni-textarea"><textarea v-model="form.content" placeholder-style="color:#13c2c2" :auto-blur="true" maxlength="-1" :placeholder="words[radomIndex]" /></view>
+			<!-- 图片 -->
+			<view class="img-list">
+				<view v-for="(i, index) in form.imgs" :key="index">
+					<view class="item-img mr20">
+						<image :src="RES_ROOT + i" mode="aspectFit" @click.native.stop="preImg(RES_ROOT + i)"></image>
+						<uni-icons type="close" color="#606266" size="20" class="del-btn" @click="handleDel(index, i)"></uni-icons>
+					</view>
+				</view>
+				<view v-if="form.imgs.length < 2" class="uni-hello-addfile f-c-c-c" @click="handleChooseImage">
+					<uni-icons type="plusempty" color="#606266" size="24" class="mb12"></uni-icons>
+					<text>选择图片</text>
 				</view>
 			</view>
+			<!-- 位置 -->
+			<view class="map" @click="handleSelLocaltion">
+				<view class="map-item">
+					<uni-icons :type="mapIcon" :color="mapColor" size="20"></uni-icons>
+					<text :style="{ color: mapColor }">{{ mapAddress }}</text>
+				</view>
+				<uni-icons class="map-action" @click.native.stop="handleClearLocaltion" :type="actionIcon" color="#ccc" size="20"></uni-icons>
+			</view>
+			<!-- 是否公开 -->
+			<view class="public-wrapper"><uni-data-checkbox v-model="form.public" :localdata="types" /></view>
+			<view class="sub-wrp"><x-login @submit="handleSubmit" /></view>
 		</view>
-		<uni-load-more v-if="currentType && currentType != 'uList'" :status="status" :content-text="contentText"></uni-load-more>
+		<uni-popup ref="popup" type="message"><uni-popup-message type="error" :message="errMsg" :duration="2000"></uni-popup-message></uni-popup>
 	</view>
 </template>
 
 <script>
-import iUser from '@/pages/user/index';
-import iWrite from '@/pages/custom/index.vue';
-import iArticle from '@/pages/article/index';
-import iDefault from '@/pages/default/index.vue';
-import aimg1 from '@/static/images/tabs/nav_1_s.png';
-import img1 from '@/static/images/tabs/nav_1_n.png';
-import aimg2 from '@/static/images/tabs/nav_2_s.png';
-import img2 from '@/static/images/tabs/nav_2_n.png';
-import aimg3 from '@/static/images/tabs/nav_3_s.png';
-import img3 from '@/static/images/tabs/nav_3_n.png';
-import { clearStorage } from '@/utils/str.js';
+import { BASE_URL } from '@/utils/http';
+import { RES_ROOT } from '@/utils/http';
+import lunarDate from '@/components/lunarDate.vue';
+import xLogin from '@/components/xLogin.vue';
+import logo from '@/static/logo.png';
+let mapObj = {
+	color: '#ccc',
+	size: '20',
+	type: 'location'
+};
 export default {
 	components: {
-		iUser,
-		iWrite,
-		iArticle,
-		iDefault
-	},
-	props: {
-		activeIndex: {
-			type: [String],
-			default: '1'
-		}
+		lunarDate,
+		xLogin
 	},
 	data() {
 		return {
-			isIphoneX: uni.getStorageSync('isIphoneX'),
-			active: uni.getStorageSync('tabIndex'),
-			tabs: [
-				{ name: '寄语墙', src: img3, asrc: aimg3, url: '/pages/article/index' },
-				{ name: '写寄语', src: img1, asrc: aimg1, url: '/pages/index/index' },
-				{ name: '我 的', src: img2, asrc: aimg2, url: '/pages/user/index' }
+			words: [
+				'路就在脚下，你无力改变终点，但却能决定脚踏出的方向',
+				'热情和欲望可以突破一切难关',
+				'忘记失败的痛苦，铭记失败的原因',
+				'要成功，不要与马赛跑，要骑在马上，马上成功',
+				'当一个人真正觉悟的一刻，他放下追寻外在世界的财富，而开始追寻他内心世界的真正财富'
 			],
-			theme: '',
-			status: 'more',
-			initLoad: false,
+			radomIndex: 0,
+			types: [
+				{
+					text: '寄语墙',
+					value: 1
+				},
+				{
+					text: '私密寄语',
+					value: 0
+				}
+			],
+			hasLocaltion: false,
+			errMsg: '请输入寄语',
+			RES_ROOT,
 			form: {
-				page: 1,
-				pageSize: 10
-			},
-			contentText: {
-				contentdown: '上拉显示更多',
-				contentrefresh: '加载中...',
-				contentnomore: '我是有底线的'
-			},
-			total: 0,
-			userInfo: {},
-			userQuery: {
-				type: 'self',
-				userId: ''
-			},
-			dList: [], // 默认列表
-			uList: [], // 用户页面
-			aList: [], // 寄语墙
-			resList: []
+				content: '',
+				imgs: [],
+				address: {},
+				public: 1
+			}
 		};
 	},
-	async onLoad(options) {
-		await this.getTheme();
-		console.log('options:', options);
-		if (options.isShare && options.isShare == '1' && options.theme == 'custom') {
-			this.active = options.tabIndex;
-			uni.setStorageSync('tabIndex', options.tabIndex);
-			// uni.redirectTo({
-			// 	url: '../index/index'
-			// });
-		}
-		setTimeout(function() {
-			console.log('start pulldown');
-		}, 300);
-		console.log('----', this.data);
-		uni.startPullDownRefresh();
-	},
-	onReachBottom() {
-		console.log('onReachBottom');
-		this.initLoad = false;
-		if (this.resList.length < 10) {
-			this.status = 'noMore';
-			return;
-		}
-		this.status = 'loading';
-		setTimeout(() => {
-			if (this.resList.length == 10) {
-				this.form.page++;
-			}
-			console.log('=====');
-			this.getData();
-		}, 300);
-	},
-	onPullDownRefresh() {
-		console.log('onPullDownRefresh');
-		console.log(this.form);
-		this.form.page = 1;
-		this.initCommon();
-		console.log('first');
-		this.getData();
-		console.log('end');
-		setTimeout(function() {
-			uni.stopPullDownRefresh();
-		}, 500);
-	},
 	computed: {
-		// 当前list值
-		currentType() {
-			let result = null;
-			switch (this.currentPage) {
-				case 'default':
-					result = 'dList';
-					break;
-				case 'article':
-					result = 'aList';
-					break;
-				case 'user':
-					result = 'uList';
-					break;
-			}
-			return result;
+		mapColor() {
+			return this.hasLocaltion ? 'green' : '#ccc';
 		},
-		// 是否有pb样式
-		wrapStyle() {
-			let style = {};
-			style.paddingBottom = this.currentType && this.theme == 'custom' ? '100rpx' : '';
-			return style;
+		mapIcon() {
+			return this.hasLocaltion ? 'location-filled' : 'location';
 		},
-		// 当前页
-		currentPage() {
-			let result = null;
-			if (this.theme == 'default') {
-				result = 'default';
-			} else if (this.theme == 'custom') {
-				if (this.active == '1') {
-					result = 'write';
-				} else if (this.active == '2') {
-					result = 'user';
-					// this.handleClick(2);
-				} else {
-					result = 'article';
-				}
-			}
-			return result;
+		actionIcon() {
+			return this.hasLocaltion ? 'close' : 'forward';
+		},
+		mapAddress() {
+			return this.hasLocaltion ? this.form.address.name : '选择位置信息';
 		}
 	},
-	watch: {
-		active: {
-			immediate: true,
-			handler(val) {
-				if (val == '0') {
-					uni.setNavigationBarTitle({
-						title: '寄语墙'
-					});
-				} else if (val == '1') {
-					uni.setNavigationBarTitle({
-						title: '写寄语'
-					});
-				} else if (val == '2') {
-					uni.setNavigationBarTitle({
-						title: '我的'
-					});
-				}
-				this.initLoad = true;
-			}
-		},
-		theme: {
-			immediate: true,
-			handler(val) {
-				if (val == 'default') {
-					uni.setNavigationBarTitle({
-						title: '寄语语录'
-					});
-				} else if (val == 'custom') {
-					uni.setNavigationBarTitle({
-						title: '写寄语'
-					});
-					uni.stopPullDownRefresh();
-				} else {
-					uni.setNavigationBarTitle({
-						title: '寄语语录'
-					});
-				}
-			}
-		}
+	onShow() {
+		this.radomIndex = Math.round(Math.random() * 4) + 0;
+	},
+	onLoad() {
+		this.$nextTick(() => {
+			this.resetForm();
+		});
 	},
 	onShareAppMessage: function(options) {
 		var that = this; // 设置菜单中的转发按钮触发转发事件时的转发内容
 		var shareObj = {
-			title: `${this.theme == 'custom' ? '写诗、写实、写史、写事' : '寄语语录'}`, // 默认是小程序的名称(可以写slogan等)
-			path: `/pages/index/index?isShare=1&tabIndex=${that.active}&theme=${that.theme}`, // 默认是当前页面，必须是以‘/’开头的完整路径
-			imgUrl: '', //自定义图片路径，可以是本地文件路径、代码包文件路径或者网络图片路径，支持PNG及JPG，不传入 imageUrl 则使用默认截图。显示图片长宽比是 5:4
+			title: '写诗、写实、写史、写事', // 默认是小程序的名称(可以写slogan等)
+			path: '/pages/index/index', // 默认是当前页面，必须是以‘/’开头的完整路径
+			imgUrl: share, //自定义图片路径，可以是本地文件路径、代码包文件路径或者网络图片路径，支持PNG及JPG，不传入 imageUrl 则使用默认截图。显示图片长宽比是 5:4
 			success: function(res) {
 				// 转发成功之后的回调
 				if (res.errMsg == 'shareAppMessage:ok') {
@@ -224,172 +126,228 @@ export default {
 		if (options.from == 'button') {
 			var eData = options.target.dataset;
 			console.log(eData.name); // shareBtn // 此处可以修改 shareObj 中的内容
-			shareObj.path = `/pages/index/index?btn_name=${eData.name}&isShare=1&tabIndex=${that.active}&theme=${that.theme}`;
+			shareObj.path = '/pages/btnname/btnname?btn_name=' + eData.name;
 		} // 返回shareObj
 		return shareObj;
 	},
 	methods: {
-		// 重新加载
-		handleReload({ page, _id }) {
-			console.log('_id:', _id);
-			if (_id) {
-				this.uList = this.uList.filter(item => item._id !== _id);
-			}
-			this.form.page = page;
-			this.getData();
+		// 重置
+		resetForm() {
+			this.form.content = '';
+			this.form.imgs = [];
+			this.form.address = {};
+			this.form.public = 1;
+			this.hasLocaltion = false;
 		},
-		// 初始化data
-		initCommon() {
-			this.initLoad = true;
-			this.dList = [];
-			this.uList = [];
-			this.aList = [];
-			this.resList = [];
-		},
-		// 点击切换
-		async handleClick(index, row) {
-			this.active = index;
-			uni.setStorageSync('tabIndex', index);
-			this.initCommon();
-
-			setTimeout(function() {
-				console.log('start pulldown');
-			}, 300);
-			uni.startPullDownRefresh();
-		},
-		// 获取主题
-		async getTheme() {
-			const { code, data } = await this.$api.wall.fetchTheme();
-			if (code == 200) {
-				this.theme = data;
-			}
-		},
-		// 个人信息
-		async getUser() {
-			this.$api.user
-				.fetchUser()
-				.then(res => {
-					const { code, result } = res;
-					if (code == 200 && result) {
-						uni.setStorageSync('hasLogin', 1);
-						this.userInfo = result;
-						this.userQuery.userId = result._id;
-					} else {
-						console.log('unlogin');
-						uni.setStorageSync('hasLogin', -1);
-						clearStorage();
-					}
-				})
-				.catch(err => {
-					console.log('err unlogin');
-					uni.setStorageSync('hasLogin', -1);
-					clearStorage();
-				});
-		},
-
-		// 获取数据
-		async getData() {
-			if (this.active == 2 && this.theme == 'custom') {
-				await this.getUser();
-			}
-			console.log('this.currentType:', this.theme, this.currentType);
-			if (!this.currentType) {
+		// 清除位置
+		handleClearLocaltion() {
+			if (!this.hasLocaltion) {
 				return;
 			}
-			console.log('===', this.currentPage);
-			let URL = null;
-			switch (this.currentPage) {
-				case 'default':
-					URL = this.$api.wall.fetchList(this.form);
-					break;
-				case 'article':
-					URL = this.$api.article.fetchList({ ...this.form, public: '1' });
-					break;
-				case 'user':
-					URL = this.$api.article.fetchList({ ...this.form, ...this.userQuery });
-					break;
-				default:
-					URL = this.$api.wall.fetchList(this.form);
+			this.hasLocaltion = false;
+			this.form.address = {};
+		},
+		// 提交
+		async handleSubmit() {
+			let query = {
+				...this.form,
+				address: JSON.stringify(this.form.address),
+				imgs: this.form.imgs.join(',')
+			};
+			if (this.form.content === '') {
+				this.$refs.popup.open();
+				return;
 			}
-			if (this.currentPage == 'user') {
-				uni.showLoading({
-					title: '加载中...',
-					mask: false
+			if (this.form.content.length > 800) {
+				this.errMsg = '寄语长度不能超过800字';
+				this.$refs.popup.open();
+				return;
+			}
+			// if (this.form.content.length > 5) {
+			// 	this.errMsg ='请输入不小于5个字的寄语'
+			// 	this.$refs.popup.open();
+			// 	return;
+			// }
+			const { code, result } = await this.$api.article.addArticle(query);
+			if (code === 200) {
+				uni.showToast({
+					title: '创建成功',
+					icon: 'success',
+					duration: 1500
+				});
+				this.resetForm();
+				uni.switchTab({
+					url: '/pages/article/index'
 				});
 			}
-			let {
-				code,
-				result: { data, total }
-			} = await URL;
-			console.log('code:', code);
-			if (code == 200) {
-				this.resList = data;
-				this.total = total;
-				let formatList = [];
-				console.log(this[this.currentType].length == 0);
-				if (this[this.currentType].length == 0) {
-					this[this.currentType] = data;
-				} else {
-					this[this.currentType] = this[this.currentType].map(item => {
-						return data.find(i => i._id == item._id) || item;
+		},
+		// 选位置
+		handleSelLocaltion() {
+			uni.chooseLocation({
+				success: res => {
+					this.form.address = Object.assign({}, res);
+					this.hasLocaltion = true;
+					mapObj = Object.assign(mapObj, { type: 'location-filled', color: 'green' });
+					console.log(res);
+				}
+			});
+		},
+		// 删除
+		handleDel(index, row) {
+			this.form.imgs.splice(index, 1);
+			console.log(index, row);
+		},
+		// 预览
+		preImg(logourl) {
+			let imgsArray = [];
+			imgsArray[0] = logourl;
+			uni.previewImage({
+				current: 0,
+				urls: imgsArray
+			});
+		},
+		// 上传
+		handleChooseImage() {
+			let that = this;
+			uni.chooseImage({
+				count: 2,
+				sourceType: ['album', 'camera'],
+				success: res => {
+					console.log('chooseImage success, temp path is', res.tempFilePaths[0]);
+					var imageSrc = res.tempFilePaths[0];
+					uni.uploadFile({
+						url: `${BASE_URL}/api/file/upload`,
+						filePath: imageSrc,
+						fileType: 'image',
+						formData: {
+							prefix: that.$dayjs().format('YYYYMMDD')
+						},
+						name: 'file',
+						success: res => {
+							console.log('uploadImage success, res is:', res);
+							const { code, result } = JSON.parse(res.data);
+							if (code === 200) {
+								uni.showToast({
+									title: '图片上传成功',
+									duration: 1000
+								});
+								that.form.imgs.push(result);
+							}
+						},
+						fail: err => {
+							console.log('uploadImage fail', err);
+							uni.showModal({
+								content: err.errMsg,
+								showCancel: false
+							});
+						}
 					});
-					let ids = this[this.currentType].map(item => item._id);
-					formatList = data.filter(item => !ids.includes(item._id));
+				},
+				fail: err => {
+					console.log('chooseImage fail', err);
+					// #ifdef MP
+					uni.getSetting({
+						success: res => {
+							let authStatus = res.authSetting['scope.album'];
+							if (!authStatus) {
+								uni.showModal({
+									title: '授权失败',
+									content: '写寄语需要从您的相册获取图片，请在设置界面打开相关权限',
+									success: res => {
+										if (res.confirm) {
+											uni.openSetting();
+										}
+									}
+								});
+							}
+						}
+					});
+					// #endif
 				}
-				// 第一次加载新数据加在前面
-				if (this.initLoad) {
-					this[this.currentType] = (this[this.currentType].length == 0 ? data : formatList).concat(this[this.currentType]);
-				} else {
-					this[this.currentType] = this[this.currentType].concat(this[this.currentType].length == 0 ? data : formatList);
-				}
-				if (data.length == 0) {
-					this.status = 'noMore';
-				}
-			}
+			});
 		}
 	}
 };
 </script>
 
 <style lang="scss" scoped>
-.b-tab {
-	position: fixed;
-	bottom: 0;
-	z-index: 99;
-	width: 750rpx;
-	height: 98rpx;
-	// padding-bottom: 22rpx;
-	bottom: var(--window-bottom);
-	background: #ffffff;
-	box-shadow: 0px -10rpx 20rpx 0px rgba(0, 0, 0, 0.1);
-
-	.t-item {
-		width: 203rpx;
-		height: 90rpx;
-		background: #fff;
-		border-radius: 5rpx;
-		position: relative;
-		image {
-			width: 44rpx;
-			height: 44rpx;
-			margin-bottom: 13rpx;
+.flex {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+.content {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	background: #f5f5f5;
+	.form-wrapper {
+		width: 100%;
+		// background-color: #fff;
+		.uni-textarea {
+			width: 100%;
+			padding: 20rpx 15rpx;
+			box-sizing: border-box;
+			textarea {
+				width: 100%;
+				height: 500rpx;
+				color: #333;
+			}
 		}
-		text {
+		.img-list {
+			background: #fff;
+			padding: 20rpx 15rpx;
+			display: flex;
+			justify-content: flex-start;
+			align-items: center;
+			.item-img {
+				position: relative;
+				width: 150rpx;
+				height: 150rpx;
+				image {
+					width: 100%;
+					height: 100%;
+				}
+				.del-btn {
+					position: absolute;
+					right: -20rpx;
+					top: -20rpx;
+				}
+			}
+		}
+		.uni-hello-addfile {
+			width: 150rpx;
+			height: 150rpx;
+			background-color: #f4f5f6;
+			color: #606266;
 			font-size: 20rpx;
-			font-family: PingFangSC-Regular, PingFang SC;
-			font-weight: 400;
-			color: #393a3a;
-			line-height: 25rpx;
+		}
+		.public-wrapper {
+			background-color: #fff;
+			padding: 10rpx 15rpx;
+			// padding-bottom: 48rpx;
+		}
+		.sub-wrp {
+			background-color: #fff;
+			padding-top: 48rpx;
+		}
+		.map {
+			@extend .flex;
+			justify-content: space-between;
+			padding: 30rpx 15rpx;
+			background-color: #fff;
+
+			&-item {
+				color: #c8c7cc;
+				@extend .flex;
+				text {
+					margin-left: 15rpx;
+				}
+			}
+			&-action {
+			}
 		}
 	}
-}
-.active {
-	background-color: #13c2c2 !important;
-	text {
-		color: #fff !important;
-	}
-}
-/deep/.uni-load-more {
-	background-color: #f5f5f5;
 }
 </style>

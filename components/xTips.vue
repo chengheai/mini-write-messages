@@ -38,7 +38,7 @@ export default {
 .tips {
 	position: absolute;
 	right: 0;
-	top: 15rpx;
+	top: 115rpx;
 	z-index: 99;
 	background-color: rgba(0, 0, 0, 0.7);
 	border-radius: 10rpx;

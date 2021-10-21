@@ -1,33 +1,17 @@
 <script>
-export default {
-	onLaunch: function() {
-		this.checkIphoneX();
-		this.checkBarH();
-		console.log('App Launch');
-	},
-	onShow: function() {
-		console.log('App Show');
-	},
-	methods: {
-		checkIphoneX() {
-			let info = uni.getSystemInfoSync();
-			if (/iPhone X/i.test(info.model)) {
-				uni.setStorageSync('isIphoneX', true);
-			} else {
-				uni.setStorageSync('isIphoneX', false);
-			}
+	export default {
+		onLaunch: function() {
+			console.log('App Launch')
 		},
-		checkBarH() {
-			let statusBarHeight = uni.getSystemInfoSync().statusBarHeight + 44;
-			uni.setStorageSync('BTHeight', statusBarHeight);
+		onShow: function() {
+			console.log('App Show')
+		},
+		onHide: function() {
+			console.log('App Hide')
 		}
-	},
-	onHide: function() {
-		console.log('App Hide');
 	}
-};
 </script>
 
 <style>
-/*每个页面公共css */
+	/*每个页面公共css */
 </style>

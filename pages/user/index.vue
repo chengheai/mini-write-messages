@@ -2,13 +2,13 @@
 	<view class="mine-wrapper">
 		<x-tips ref="myTip" />
 		<view class="bg"></view>
-		<view class="mine" v-if="hasLogin == '-1'">
+		<view class="mine" v-if="hasLogin === false">
 			<image class="logo" src="../../static/logo5.png" mode="aspectFit"></image>
 			<view class="title">写寄语</view>
 			<view class="decs">写诗、写实、写史、写事</view>
 			<x-login title="微信一键登录" style="margin-top: 48rpx;" @submit="handleSubmit" />
 		</view>
-		<view class="center" v-if="hasLogin == '1'">
+		<view class="center" v-if="hasLogin === true">
 			<view class="center-avatar">
 				<image :src="userInfo.avatarUrl || base64Avatar" mode="aspectFill"></image>
 				<view class="avatar-name">
@@ -37,12 +37,11 @@
 					</view>
 				</view>
 			</view>
-			<view class="" style="padding-bottom: 100rpx;" v-if="hasData">
-				<view class="m-list" v-for="(item, index) in payload" :key="index">
-					<x-card :showAvatar="false" :showAction='true' :subIndex="index" :showReport="false" @reload="handleReload" :dataSource="item" />
-				</view>
+			<view class="" v-if="hasData">
+				<view class="m-list" v-for="(item, index) in list" :key="index"><x-card :showAvatar="false" :subIndex='index' :showReport="false" @reload="handleReload" :dataSource="item" /></view>
+				<uni-load-more color="#fff" :content-text='contentText' :status="status"></uni-load-more>
 			</view>
-			<x-empty v-if="!hasData" />
+			<x-empty v-else />
 		</view>
 	</view>
 </template>
@@ -53,7 +52,6 @@ import xEmpty from '@/components/xEmpty.vue';
 import xLogin from '@/components/xLogin.vue';
 import xTips from '@/components/xTips.vue';
 import share from '@/static/images/share.jpg';
-
 let base64Avatar =
 	'data:image/jpg;base64,/9j/4QAYRXhpZgAASUkqAAgAAAAAAAAAAAAAAP/sABFEdWNreQABAAQAAAA8AAD/4QMraHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wLwA8P3hwYWNrZXQgYmVnaW49Iu+7vyIgaWQ9Ilc1TTBNcENlaGlIenJlU3pOVGN6a2M5ZCI/PiA8eDp4bXBtZXRhIHhtbG5zOng9ImFkb2JlOm5zOm1ldGEvIiB4OnhtcHRrPSJBZG9iZSBYTVAgQ29yZSA1LjMtYzAxMSA2Ni4xNDU2NjEsIDIwMTIvMDIvMDYtMTQ6NTY6MjcgICAgICAgICI+IDxyZGY6UkRGIHhtbG5zOnJkZj0iaHR0cDovL3d3dy53My5vcmcvMTk5OS8wMi8yMi1yZGYtc3ludGF4LW5zIyI+IDxyZGY6RGVzY3JpcHRpb24gcmRmOmFib3V0PSIiIHhtbG5zOnhtcD0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wLyIgeG1sbnM6eG1wTU09Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9tbS8iIHhtbG5zOnN0UmVmPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvc1R5cGUvUmVzb3VyY2VSZWYjIiB4bXA6Q3JlYXRvclRvb2w9IkFkb2JlIFBob3Rvc2hvcCBDUzYgKFdpbmRvd3MpIiB4bXBNTTpJbnN0YW5jZUlEPSJ4bXAuaWlkOjREMEQwRkY0RjgwNDExRUE5OTY2RDgxODY3NkJFODMxIiB4bXBNTTpEb2N1bWVudElEPSJ4bXAuZGlkOjREMEQwRkY1RjgwNDExRUE5OTY2RDgxODY3NkJFODMxIj4gPHhtcE1NOkRlcml2ZWRGcm9tIHN0UmVmOmluc3RhbmNlSUQ9InhtcC5paWQ6NEQwRDBGRjJGODA0MTFFQTk5NjZEODE4Njc2QkU4MzEiIHN0UmVmOmRvY3VtZW50SUQ9InhtcC5kaWQ6NEQwRDBGRjNGODA0MTFFQTk5NjZEODE4Njc2QkU4MzEiLz4gPC9yZGY6RGVzY3JpcHRpb24+IDwvcmRmOlJERj4gPC94OnhtcG1ldGE+IDw/eHBhY2tldCBlbmQ9InIiPz7/7gAOQWRvYmUAZMAAAAAB/9sAhAAGBAQEBQQGBQUGCQYFBgkLCAYG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';
 export default {
@@ -65,36 +63,99 @@ export default {
 	},
 	data() {
 		return {
-			hasLogin: uni.getStorageSync('hasLogin') || null,
-			base64Avatar
+			hasLogin: null,
+			initLoad: false,
+			base64Avatar,
+			list: [],
+			resList: [],
+			total: 0,
+			status: 'more',
+			from: {
+				page: 1,
+				pageSize: 10,
+				type: 'self',
+				userId: ''
+			},
+			contentText: {
+				contentdown: '上拉显示更多',
+				contentrefresh: '加载中...',
+				contentnomore: '我是有底线的'
+			},
+			userInfo: {}
 		};
-	},
-	props: {
-		payload: {
-			type: Array,
-			default: () => []
-		},
-		userInfo: {
-			type: Object,
-			default: () => {}
-		},
-		total: {
-			type: Number,
-			default: 0
-		}
 	},
 	computed: {
 		hasData() {
-			return this.payload.length !== 0;
+			return this.list.length !== 0;
 		},
 		integral() {
 			return Math.ceil(this.total * 0.58936);
 		}
 	},
-
+	onShareAppMessage: function(options) {
+		var that = this; // 设置菜单中的转发按钮触发转发事件时的转发内容
+		var shareObj = {
+			title: '写诗、写实、写史、写事', // 默认是小程序的名称(可以写slogan等)
+			path: '/pages/index/index', // 默认是当前页面，必须是以‘/’开头的完整路径
+			imgUrl: share, //自定义图片路径，可以是本地文件路径、代码包文件路径或者网络图片路径，支持PNG及JPG，不传入 imageUrl 则使用默认截图。显示图片长宽比是 5:4
+			success: function(res) {
+				// 转发成功之后的回调
+				if (res.errMsg == 'shareAppMessage:ok') {
+					console.log('分享ok');
+				}
+			},
+			fail: function() {
+				// 转发失败之后的回调
+				if (res.errMsg == 'shareAppMessage:fail cancel') {
+					// 用户取消转发
+				} else if (res.errMsg == 'shareAppMessage:fail') {
+					// 转发失败，其中 detail message 为详细失败信息
+				}
+			}
+		}; // 来自页面内的按钮的转发
+		if (options.from == 'button') {
+			var eData = options.target.dataset;
+			console.log(eData.name); // shareBtn // 此处可以修改 shareObj 中的内容
+			shareObj.path = '/pages/btnname/btnname?btn_name=' + eData.name;
+		} // 返回shareObj
+		return shareObj;
+	},
+	async onShow() {
+		this.initLoad = true;
+		this.list = [];
+		await this.getUser();
+		this.getData();
+		// setTimeout(function() {
+		// 	console.log('start pulldown');
+		// }, 1000);
+		// uni.startPullDownRefresh();
+	},
+	onReachBottom() {
+		console.log('onReachBottom');
+		this.initLoad = false;
+		if (this.resList.length < 10) {
+			this.status = 'noMore';
+			return;
+		}
+		this.status = 'loading';
+		setTimeout(() => {
+			if (this.resList.length === 10) {
+				this.from.page++;
+			}
+			this.getData();
+		}, 300);
+	},
+	async onPullDownRefresh() {
+		this.from.page = 1;
+		this.getData();
+		setTimeout(function() {
+			uni.stopPullDownRefresh();
+		}, 300);
+	},
 	methods: {
 		async handleSubmit() {
 			await this.getUser();
+			this.getData();
 		},
 		handleFav() {
 			this.$refs.myTip.tipVisible = true;
@@ -112,7 +173,53 @@ export default {
 			});
 		},
 		handleReload(page) {
-			this.$emit('u-reload', page);
+			this.from.page = page;
+			this.getData();
+		},
+		async getUser() {
+			this.$api.user
+				.fetchUser()
+				.then(res => {
+					const { code, result } = res;
+					if (code === 200) {
+						this.hasLogin = true;
+						this.userInfo = result;
+						this.from.userId = result._id;
+					}
+				})
+				.catch(err => {
+					// this.hasLogin = false;
+					console.log('err');
+				});
+		},
+		async getData() {
+			const {
+				code,
+				result: { data, total }
+			} = await this.$api.article.fetchList(this.from);
+			if (code === 200) {
+				this.resList = data;
+				this.total = total;
+				let formatList = [];
+				if (this.list.length === 0) {
+					this.list = data;
+				} else {
+					this.list = this.list.map(item => {
+						return data.find(i => i._id === item._id) || item;
+					});
+					let ids = this.list.map(item => item._id);
+					formatList = data.filter(item => !ids.includes(item._id));
+				}
+				// 第一次加载新数据加在前面
+				if (this.initLoad) {
+					this.list = (this.list.length === 0 ? data : formatList).concat(this.list);
+				} else {
+					this.list = this.list.concat(this.list.length === 0 ? data : formatList);
+				}
+				if (data.length === 0) {
+					this.status = 'noMore';
+				}
+			}
 		}
 	}
 };
@@ -127,7 +234,7 @@ export default {
 .mine-wrapper {
 	position: relative;
 	background-color: #f5f5f5;
-	height: auto;
+	height: 100vh;
 	.bg {
 		position: fixed;
 		background: url('../../static/images/3.webp') no-repeat;
@@ -139,8 +246,8 @@ export default {
 	}
 	.center {
 		position: absolute;
-		min-height: calc(100vh - 100rpx);
-		padding: 50rpx 15rpx 15rpx;
+		min-height: calc(100vh - 160rpx);
+		padding: 120rpx 15rpx 80rpx;
 		width: 100%;
 		box-sizing: border-box;
 		z-index: 3;
@@ -204,7 +311,7 @@ export default {
 	}
 	.mine {
 		width: 100%;
-		height: calc(100vh - 100rpx);
+		height: 100vh;
 		position: absolute;
 		z-index: 3;
 		// background: url('../../static/images/b2.webp') no-repeat;

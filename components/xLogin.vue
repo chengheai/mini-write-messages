@@ -1,6 +1,6 @@
 <template>
 	<view class="brn-wrap">
-		<view class="uni-btn-v" v-if="hasLogin !='1'">
+		<view class="uni-btn-v" v-if="!hasLogin">
 			<button @click="handleBeforeLogin">{{ title }}</button>
 		</view>
 		<view class="uni-btn-v" v-else>
@@ -20,7 +20,7 @@ export default {
 	},
 	data() {
 		return {
-			hasLogin: uni.getStorageSync('hasLogin')
+			hasLogin: false
 		};
 	},
 	methods: {
@@ -60,11 +60,9 @@ export default {
 						uni.setStorageSync('userInfo', JSON.stringify(detail.userInfo));
 						uni.setStorageSync('token', result.token);
 						uni.setStorageSync('userId', result.userId);
-						uni.setStorageSync('hasLogin', 1);
-						// this.hasLogin = true;
-						uni.setStorageSync('tabIndex', 1);
-						uni.redirectTo({
-							url: '../index/index'
+						this.hasLogin =true;
+						uni.switchTab({
+							url: '/pages/index/index'
 						});
 					} else {
 						uni.showModal({
